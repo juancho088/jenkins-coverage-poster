@@ -75,11 +75,15 @@ def Double getCoverage(String ref) {
                     usernameVariable: 'NOT_USED', passwordVariable: 'TOKEN']]) {
 
     final coverage = sh(returnStdout: true, script: """#!/bin/bash -xe
-      GITHUB_HOST=\$(git config remote.origin.url | cut -d/ -f3)
+      GITHUB_URL=\$(git config remote.origin.url)
+      GITHUB_HOST=\$(\${GITHUB_URL} | cut -d/ -f3)
       GITHUB_API_URL=\$([[ "\${GITHUB_HOST}" == "github.com" ]] && echo "api.github.com" || echo "\${GITHUB_HOST}/api/v3")
-      ORG_REPO_BRANCH_ARRAY=(\${JOB_NAME//// })
-      ORG=\${ORG_REPO_BRANCH_ARRAY[0]}
-      REPO=\${ORG_REPO_BRANCH_ARRAY[1]}
+      })
+
+      SEGMENT = (\${GITHUB_URL}).replace("https://github.com/","").replace(".git", "").split("/")
+
+      ORG=SEGMENT[0]
+      REPO=SEGMENT[1]
 
       if [[ ${ref} == HEAD ]]; then
         COMMIT_HASH=\$(git rev-parse HEAD)
@@ -115,11 +119,16 @@ def postCommitStatus(String state, String context, String description) {
 
     // yay, escaping! https://gist.github.com/Faheetah/e11bd0315c34ed32e681616e41279ef4
     final script = """#!/bin/bash -xe
-      GITHUB_HOST=\$(git config remote.origin.url | cut -d/ -f3)
+      GITHUB_URL=\$(git config remote.origin.url)
+      GITHUB_HOST=\$(\${GITHUB_URL} | cut -d/ -f3)
       GITHUB_API_URL=\$([[ "\${GITHUB_HOST}" == "github.com" ]] && echo "api.github.com" || echo "\${GITHUB_HOST}/api/v3")
-      ORG_REPO_BRANCH_ARRAY=(\${JOB_NAME//// })
-      ORG=\${ORG_REPO_BRANCH_ARRAY[0]}
-      REPO=\${ORG_REPO_BRANCH_ARRAY[1]}
+      )
+
+      SEGMENT = (\${GITHUB_URL}).replace("https://github.com/","").replace(".git", "").split("/")
+
+      ORG=SEGMENT[0]
+      REPO=SEGMENT[1]
+
       COMMIT_HASH=\$(git rev-parse HEAD)
       TOKEN_PARAM="access_token=\${TOKEN}"
       COMMIT_STATUS_URL=\$(echo "https://\${GITHUB_API_URL}/repos/\${ORG}/\${REPO}/statuses/\${COMMIT_HASH}")
