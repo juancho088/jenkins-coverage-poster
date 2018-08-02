@@ -78,12 +78,9 @@ def Double getCoverage(String ref) {
       GITHUB_URL=\$(git config remote.origin.url)
       GITHUB_HOST=\$( "\${GITHUB_URL}" | cut -d/ -f3)
       GITHUB_API_URL=\$([[ "\${GITHUB_HOST}" == "github.com" ]] && echo "api.github.com" || echo "\${GITHUB_HOST}/api/v3")
-      })
-
-      SEGMENT = (\${GITHUB_URL}).replace("https://github.com/","").replace(".git", "").split("/")
-
-      ORG=SEGMENT[0]
-      REPO=SEGMENT[1]
+      )
+      ORG=\$("\${GITHUB_URL}" | cut -d/ -f4)
+      REPO=\$("\${GITHUB_URL}" | cut -d/ -f5)
 
       if [[ ${ref} == HEAD ]]; then
         COMMIT_HASH=\$(git rev-parse HEAD)
@@ -122,13 +119,8 @@ def postCommitStatus(String state, String context, String description) {
       GITHUB_URL=\$(git config remote.origin.url)
       GITHUB_HOST=\$( "\${GITHUB_URL}" | cut -d/ -f3)
       GITHUB_API_URL=\$([[ "\${GITHUB_HOST}" == "github.com" ]] && echo "api.github.com" || echo "\${GITHUB_HOST}/api/v3")
-      )
-
-      SEGMENT = (\${GITHUB_URL}).replace("https://github.com/","").replace(".git", "").split("/")
-
-      ORG=SEGMENT[0]
-      REPO=SEGMENT[1]
-
+      ORG=\$("\${GITHUB_URL}" | cut -d/ -f4)
+      REPO=\$("\${GITHUB_URL}" | cut -d/ -f5)
       COMMIT_HASH=\$(git rev-parse HEAD)
       TOKEN_PARAM="access_token=\${TOKEN}"
       COMMIT_STATUS_URL=\$(echo "https://\${GITHUB_API_URL}/repos/\${ORG}/\${REPO}/statuses/\${COMMIT_HASH}")
