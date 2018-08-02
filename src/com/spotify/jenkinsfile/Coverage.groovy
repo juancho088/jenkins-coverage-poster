@@ -76,7 +76,7 @@ def Double getCoverage(String ref) {
 
     final coverage = sh(returnStdout: true, script: """#!/bin/bash -xe
       GITHUB_URL=\$(git config remote.origin.url)
-      GITHUB_HOST=\$(\${GITHUB_URL} | cut -d/ -f3)
+      GITHUB_HOST=\$( "\${GITHUB_URL}"" | cut -d/ -f3)
       GITHUB_API_URL=\$([[ "\${GITHUB_HOST}" == "github.com" ]] && echo "api.github.com" || echo "\${GITHUB_HOST}/api/v3")
       })
 
@@ -120,7 +120,7 @@ def postCommitStatus(String state, String context, String description) {
     // yay, escaping! https://gist.github.com/Faheetah/e11bd0315c34ed32e681616e41279ef4
     final script = """#!/bin/bash -xe
       GITHUB_URL=\$(git config remote.origin.url)
-      GITHUB_HOST=\$(\${GITHUB_URL} | cut -d/ -f3)
+      GITHUB_HOST=\$( "\${GITHUB_URL}"" | cut -d/ -f3)
       GITHUB_API_URL=\$([[ "\${GITHUB_HOST}" == "github.com" ]] && echo "api.github.com" || echo "\${GITHUB_HOST}/api/v3")
       )
 
